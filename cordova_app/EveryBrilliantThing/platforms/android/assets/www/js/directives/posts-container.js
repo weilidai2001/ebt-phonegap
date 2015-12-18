@@ -4,8 +4,13 @@ angular.module('PostsContainerDirective', ['SearchService'])
       templateUrl: 'partials/posts-container.html',
       restrict: 'A',
       scope: {},
-      controller: function($scope) {
-        $scope.posts = [
+      controller: function($scope, $rootScope) {
+        $scope.posts = [];
+        $scope.selectedPosts = [];
+        $scope.searchFilter = '';
+        $scope.tagFilter = '';
+
+        var cachedPosts = [
           {
             "_id": 1,
             "body": "Ice cream",
@@ -459,10 +464,6 @@ angular.module('PostsContainerDirective', ['SearchService'])
           }
         ];
 
-        $scope.selectedPosts = [];
-        $scope.searchFilter = '';
-        $scope.tagFilter = '';
-
         function filterByUrlQueryParams() {
           if ($routeParams.ids) {
             var visibleIds = $routeParams.ids.split("-");
@@ -476,13 +477,27 @@ angular.module('PostsContainerDirective', ['SearchService'])
           }
         }
 
-        $http
-          .get('http://everybrilliantthing.tk/rest/posts')
-          .success(function(response) {
-            $scope.posts = response;
-            filterByUrlQueryParams();
-            $scope.tagsVisible = !$routeParams.ids;
-          });
+        function loadPosts(posts){
+          $scope.posts = posts;
+          filterByUrlQueryParams();
+          $scope.tagsVisible = !$routeParams.ids;
+        }
+
+        loadPosts(cachedPosts);
+
+        function fetchPosts(loader){
+          $http
+            .get('http://everybrilliantthing.tk/rest/posts')
+            .success(function(posts) {
+              loader(posts)
+            });
+        }
+
+        $rootScope.$on('refresh', function(){
+          fetchPosts(loadPosts);
+        });
+
+        fetchPosts(loadPosts);
       }
     };
   }]);
