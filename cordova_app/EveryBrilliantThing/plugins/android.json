@@ -19,7 +19,7 @@
     },
     "installed_plugins": {
         "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "com.phonegap.everybrilliantthing"
+            "PACKAGE_NAME": "com.EveryBrilliantThing"
         }
     },
     "dependent_plugins": {}
